@@ -16,6 +16,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [justStarted, setJustStarted] = useState(false);
 
   const fetchStatus = useCallback(async () => {
     try {
@@ -48,7 +49,8 @@ export default function Home() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Action failed");
-      // give GitHub a moment then refresh
+      if (action === "start") setJustStarted(true);
+      if (action === "stop") setJustStarted(false);
       setTimeout(fetchStatus, 1500);
     } catch (e: any) {
       setError(e.message);
@@ -72,7 +74,7 @@ export default function Home() {
         ) : (
           <>
             <div style={styles.statusBox}>
-              <span style={styles.label}>Status</span>
+              <span style={styles.label}>Codespace</span>
               <span
                 style={{
                   ...styles.badge,
@@ -115,6 +117,30 @@ export default function Home() {
               </button>
             </div>
 
+            {isRunning && (
+              <div style={styles.progressBox}>
+                <p style={styles.progressTitle}>Watch agent progress</p>
+                <a
+                  href="https://antigravity.google.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={styles.hubBtn}
+                >
+                  Open Antigravity Hub →
+                </a>
+                <p style={styles.progressHint}>
+                  After Start, wait ~30–60s for AGY + remote-control to boot,
+                  then open the Hub and select instance{" "}
+                  <strong>codespace-cloudbox</strong>.
+                </p>
+                {justStarted && (
+                  <p style={styles.progressHint}>
+                    Just started — give the Codespace a minute before the Hub shows it.
+                  </p>
+                )}
+              </div>
+            )}
+
             {status?.web_url && isRunning && (
               <a
                 href={status.web_url}
@@ -122,7 +148,7 @@ export default function Home() {
                 rel="noreferrer"
                 style={styles.link}
               >
-                Open Codespace →
+                Open Codespace terminal (debug) →
               </a>
             )}
           </>
@@ -131,7 +157,8 @@ export default function Home() {
         {error && <p style={styles.error}>{error}</p>}
 
         <p style={styles.hint}>
-          AGY remote-control starts automatically when the Codespace boots.
+          On boot: tmux starts <code>agy --remote-control</code> (or sends{" "}
+          <code>/remote-control</code>). Use the Hub for live progress — not the Codespace UI.
         </p>
       </div>
     </main>
@@ -153,7 +180,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 16,
     padding: "32px 28px",
     width: "100%",
-    maxWidth: 380,
+    maxWidth: 400,
     boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
     textAlign: "center",
   },
@@ -213,12 +240,42 @@ const styles: Record<string, React.CSSProperties> = {
   stop: {
     background: "#dc2626",
   },
+  progressBox: {
+    marginTop: 8,
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 12,
+    background: "#0f172a",
+    border: "1px solid #334155",
+  },
+  progressTitle: {
+    margin: "0 0 10px",
+    color: "#e2e8f0",
+    fontSize: 14,
+    fontWeight: 600,
+  },
+  hubBtn: {
+    display: "inline-block",
+    background: "#2563eb",
+    color: "#fff",
+    textDecoration: "none",
+    padding: "10px 16px",
+    borderRadius: 8,
+    fontSize: 14,
+    fontWeight: 600,
+  },
+  progressHint: {
+    margin: "10px 0 0",
+    color: "#94a3b8",
+    fontSize: 12,
+    lineHeight: 1.45,
+  },
   link: {
     display: "inline-block",
     marginTop: 8,
     color: "#38bdf8",
     textDecoration: "none",
-    fontSize: 14,
+    fontSize: 13,
   },
   error: {
     color: "#f87171",
@@ -229,7 +286,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: 28,
     color: "#475569",
     fontSize: 12,
-    lineHeight: 1.4,
+    lineHeight: 1.45,
   },
   status: {
     color: "#94a3b8",
