@@ -117,29 +117,26 @@ export default function Home() {
               </button>
             </div>
 
-            {isRunning && (
-              <div style={styles.progressBox}>
-                <p style={styles.progressTitle}>Watch agent progress</p>
-                <a
-                  href="https://antigravity.google.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={styles.hubBtn}
-                >
-                  Open Antigravity Hub →
-                </a>
+            <div style={styles.progressBox}>
+              <p style={styles.progressTitle}>Watch agent progress</p>
+              <a
+                href="https://antigravity.google.com"
+                target="_blank"
+                rel="noreferrer"
+                style={styles.hubBtn}
+              >
+                Open Antigravity Hub →
+              </a>
+              <p style={styles.progressHint}>
+                After Start, wait ~1–2 min for AGY remote-control, then open the Hub
+                and select <strong>codespace-cloudbox</strong>.
+              </p>
+              {justStarted && (
                 <p style={styles.progressHint}>
-                  After Start, wait ~30–60s for AGY + remote-control to boot,
-                  then open the Hub and select instance{" "}
-                  <strong>codespace-cloudbox</strong>.
+                  Just started — give the Codespace a minute before the Hub shows it.
                 </p>
-                {justStarted && (
-                  <p style={styles.progressHint}>
-                    Just started — give the Codespace a minute before the Hub shows it.
-                  </p>
-                )}
-              </div>
-            )}
+              )}
+            </div>
 
             {status?.web_url && isRunning && (
               <a
@@ -157,8 +154,8 @@ export default function Home() {
         {error && <p style={styles.error}>{error}</p>}
 
         <p style={styles.hint}>
-          On boot: tmux starts <code>agy --remote-control</code> (or sends{" "}
-          <code>/remote-control</code>). Use the Hub for live progress — not the Codespace UI.
+          On boot the Codespace runs <code>agy remote-control start</code>.
+          Live tasks and progress are on the Hub, not this page.
         </p>
       </div>
     </main>
