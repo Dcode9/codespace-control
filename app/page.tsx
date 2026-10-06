@@ -128,12 +128,14 @@ export default function Home() {
                 Open Antigravity Hub →
               </a>
               <p style={styles.progressHint}>
-                After Start, wait ~1–2 min for AGY remote-control, then open the Hub
-                and select <strong>codespace-cloudbox</strong>.
+                After <strong>Start</strong>, wait <strong>2–3 minutes</strong>.
+                A GitHub Action SSHs into the Codespace and runs{" "}
+                <code>agy remote-control start</code> — you do <strong>not</strong> need to open the Codespace in a browser.
+                Then open the Hub and select <strong>codespace-cloudbox</strong>.
               </p>
               {justStarted && (
                 <p style={styles.progressHint}>
-                  Just started — give the Codespace a minute before the Hub shows it.
+                  Boot workflow running… check Actions on antigravity-devbox if Hub stays empty.
                 </p>
               )}
             </div>
@@ -145,7 +147,7 @@ export default function Home() {
                 rel="noreferrer"
                 style={styles.link}
               >
-                Open Codespace terminal (debug) →
+                Open Codespace (debug only) →
               </a>
             )}
           </>
@@ -154,8 +156,7 @@ export default function Home() {
         {error && <p style={styles.error}>{error}</p>}
 
         <p style={styles.hint}>
-          On boot the Codespace runs <code>agy remote-control start</code>.
-          Live tasks and progress are on the Hub, not this page.
+          Start wakes the VM + triggers SSH boot of AGY. Live work is on the Hub.
         </p>
       </div>
     </main>
