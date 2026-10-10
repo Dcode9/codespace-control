@@ -130,7 +130,7 @@ export default function Home() {
               <p style={styles.progressHint}>
                 After <strong>Start</strong>, wait <strong>2–3 minutes</strong>.
                 A GitHub Action SSHs into the Codespace and runs{" "}
-                <code>agy remote-control start</code> — you do <strong>not</strong> need to open the Codespace in a browser.
+                <code>agy remote-control start</code>. You do <strong>not</strong> need to open the Codespace in a browser.
                 Then open the Hub and select <strong>codespace-cloudbox</strong>.
               </p>
               {justStarted && (
