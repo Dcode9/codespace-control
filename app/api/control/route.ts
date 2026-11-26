@@ -27,13 +27,6 @@ async function gh(path: string, init: RequestInit = {}) {
   return { res, json };
 }
 
-async function getCodespace() {
-  const { json } = await gh("/user/codespaces");
-  return (json?.codespaces || []).find(
-    (c: any) => c.repository?.full_name === REPO
-  );
-}
-
 /** Trigger Actions workflow that SSHs into the Codespace and runs start-remote.sh */
 async function dispatchBootAgy() {
   const { res, json } = await gh(
@@ -46,11 +39,15 @@ async function dispatchBootAgy() {
       }),
     }
   );
-  // 204 = accepted
   return { ok: res.status === 204 || res.ok, status: res.status, body: json };
 }
 
 export async function POST(req: NextRequest) {
+  const secret = req.headers.get("x-control-secret") || req.nextUrl.searchParams.get("secret");
+  if (process.env.CONTROL_SECRET && secret !== process.env.CONTROL_SECRET) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   if (!TOKEN) {
     return NextResponse.json(
       { error: "Missing GITHUB_CODESPACE_TOKEN" },
@@ -68,7 +65,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let cs = await getCodespace();
+  const { res: listRes, json: listJson } = await gh("/user/codespaces");
+  if (!listRes.ok) {
+    return NextResponse.json(
+      { error: "Upstream GitHub error fetching codespaces", status: listRes.status },
+      { status: 502 }
+    );
+  }
+
+  const cs = (listJson?.codespaces || []).find(
+    (c: any) => c.repository?.full_name === REPO
+  );
 
   if (!cs && action === "start") {
     const { res, json } = await gh("/user/codespaces", {
